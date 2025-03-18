@@ -34,6 +34,8 @@ def fetch_yfinance(
     interval: str = "1d",
 ) -> list[Olhcv]:
     olhcvs = yf.download(symbol, start=start, end=end, period=period, interval=interval)
+
+    # TODO: Refactor this part to a function into service
     olhcvs.columns = ["open", "low", "high", "close", "volume"]
     olhcvs["symbol"] = symbol
     olhcvs["id"] = olhcvs.apply(lambda _: cuid.cuid(), axis=1)
