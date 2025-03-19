@@ -3,8 +3,7 @@ from ..cores.database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from ..models.olhcv import Olhcv, mysql_upsert
-import yfinance as yf
-import cuid
+from ..services.olhcv_service import yfinance2olhcvs
 
 sessionDep = Annotated[Session, Depends(get_db)]
 
@@ -33,14 +32,7 @@ def fetch_yfinance(
     period: str = "1d",
     interval: str = "1d",
 ) -> list[Olhcv]:
-    olhcvs = yf.download(symbol, start=start, end=end, period=period, interval=interval)
-
-    # TODO: Refactor this part to a function into service
-    olhcvs.columns = ["open", "low", "high", "close", "volume"]
-    olhcvs["symbol"] = symbol
-    olhcvs["id"] = olhcvs.apply(lambda _: cuid.cuid(), axis=1)
-    olhcvs["timestamp"] = olhcvs.index
-    olhcvs = olhcvs.apply(lambda x: Olhcv(**x), axis=1).reset_index(drop=True).to_list()
+    olhcvs = yfinance2olhcvs(symbol, start, end, period, interval)
     session.exec(mysql_upsert(olhcvs))
     session.commit()
     return olhcvs
