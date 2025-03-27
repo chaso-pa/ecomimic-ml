@@ -9,7 +9,8 @@ class Olhcv(SQLModel, table=True):
     __tablename__ = "olhcvs"
 
     id: str = Field(default=cuid.cuid(), primary_key=True)
-    timestamp: datetime = Field(nullable=False, sa_column_kwargs={"name": "timestamp"})
+    timestamp: datetime = Field(
+        nullable=False, sa_column_kwargs={"name": "timestamp"})
     symbol: str = Field(nullable=False, sa_column_kwargs={"name": "symbol"})
     open: float = Field(nullable=False, sa_column_kwargs={"name": "open"})
     high: float = Field(nullable=False, sa_column_kwargs={"name": "high"})
@@ -27,7 +28,6 @@ def mysql_upsert(values: list[Olhcv]):
     value_dicts = [v.dict() for v in values]
 
     stmt = mysql_insert(Olhcv).values(value_dicts)
-    print(stmt)
     stmt = stmt.on_duplicate_key_update(
         open=stmt.inserted.open,
         high=stmt.inserted.high,
