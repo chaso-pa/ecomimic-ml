@@ -39,7 +39,7 @@ def fetch_fred(
     return indicators
 
 
-@router.get("fred/fetch_all")
+@router.get("/fred/fetch_all")
 def fetch_all_fred(session: sessionDep) -> list[EconomicIndicator]:
     indices = session.exec(select(FredIndex).where(
         FredIndex.crawl_status)).all()
@@ -53,8 +53,8 @@ def fetch_all_fred(session: sessionDep) -> list[EconomicIndicator]:
 
 @router.get("/{id}")
 def show_economic_indicator(id: str, session: sessionDep) -> EconomicIndicator:
-    olhcv = session.get(EconomicIndicator, id)
-    if not olhcv:
+    indicators = session.get(EconomicIndicator, id)
+    if not indicators:
         raise HTTPException(
             status_code=404, detail="Economic indicator not found")
-    return olhcv
+    return indicators

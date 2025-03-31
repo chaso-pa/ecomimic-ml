@@ -1,11 +1,12 @@
 import pandas as pd
 import cuid
+import os
 from fredapi import Fred
 from ..models.economic_indicator import EconomicIndicator
 
 
 def fred2indicators(country, name, limit=100) -> list[EconomicIndicator]:
-    fred = Fred(api_key="6df528ba9360628175d6f8e715e1211b")
+    fred = Fred(api_key=os.getenv("FRED_API_KEY"))
     data = pd.DataFrame(fred.get_series(name), columns=["value"])
     # Drop rows with missing values
     data = data.dropna()
